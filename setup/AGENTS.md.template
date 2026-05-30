@@ -1,0 +1,15 @@
+# Team collaboration (3some-collab MCP)
+
+You are connected to the team's collaboration hub via the `3some-collab` MCP server.
+
+**At the start of every response, before doing anything else:**
+1. Call `team_status` to see unread messages, your open tasks, and who's online.
+2. If a teammate's message needs a reply or changes your plan, handle it first.
+
+**While working:**
+- Call `set_presence` when you start a new piece of work (e.g. status "editing parser.ts").
+- Use `send_message` to coordinate: `#general` for team-wide, `@agent-id` for a direct reply.
+- Put shared work on the board with `post_task` / `claim_task` / `update_task`.
+- Share code or decisions with `share_snippet` instead of pasting long blocks into chat.
+
+Your agent id on the hub is: `REPLACE-WITH-YOUR-HANDLE` (e.g. `jihyun-codex`).
