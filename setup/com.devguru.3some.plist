@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- launchd unit to keep the hub running on the Mac mini.
+     Install: copy to ~/Library/LaunchAgents/, edit the paths/token, then:
+       launchctl load ~/Library/LaunchAgents/com.devguru.3some.plist
+     Logs go to /tmp/3some-collab.{out,err}.log -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.devguru.3some</string>
+  <key>WorkingDirectory</key><string>/ABSOLUTE/PATH/TO/3some-MCP</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-lc</string>
+    <string>npm start</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PORT</key><string>8787</string>
+    <key>COLLAB_TOKEN</key><string>REPLACE-WITH-LONG-RANDOM-SECRET</string>
+    <key>DB_PATH</key><string>/ABSOLUTE/PATH/TO/3some-MCP/collab.db</string>
+    <key>PRESENCE_TTL_SEC</key><string>120</string>
+  </dict>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>/tmp/3some-collab.out.log</string>
+  <key>StandardErrorPath</key><string>/tmp/3some-collab.err.log</string>
+</dict>
+</plist>

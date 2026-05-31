@@ -1,0 +1,15 @@
+{
+  "_comment": "Merge this into ~/.claude/settings.json (or the project .claude/settings.json). Adjust the absolute path to inbox-hook.sh.",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/ABSOLUTE/PATH/TO/3some-MCP/setup/inbox-hook.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
