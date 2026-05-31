@@ -54,6 +54,7 @@ const CHAT_HTML = /* html */ `<!doctype html>
 <style>
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body { margin: 0; font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
          background: #0d1117; color: #e6edf3; height: 100vh; display: flex; }
   #side { width: 200px; border-right: 1px solid #21262d; padding: 14px; flex-shrink: 0; overflow-y: auto; }
