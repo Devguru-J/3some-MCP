@@ -69,4 +69,34 @@ describe("REST inbox/heartbeat", () => {
     expect(res.status).toBe(200);
     expect((await res.json()).ok).toBe(true);
   });
+
+  // --- Codex compatibility: bearer token + ?agent_id query param ---
+
+  it("accepts Authorization: Bearer in place of X-Auth-Token", async () => {
+    const res = await fetch(`${base}/inbox`, {
+      headers: { Authorization: `Bearer ${TOKEN}`, "X-Agent-Id": "codex" },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  it("rejects a wrong Bearer token", async () => {
+    const res = await fetch(`${base}/inbox`, {
+      headers: { Authorization: "Bearer wrong", "X-Agent-Id": "codex" },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("resolves identity from ?agent_id when X-Agent-Id is absent", async () => {
+    const res = await fetch(`${base}/inbox?agent_id=codex`, {
+      headers: { "X-Auth-Token": TOKEN },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  it("still 400s when neither X-Agent-Id nor ?agent_id is given", async () => {
+    const res = await fetch(`${base}/inbox`, {
+      headers: { Authorization: `Bearer ${TOKEN}` },
+    });
+    expect(res.status).toBe(400);
+  });
 });

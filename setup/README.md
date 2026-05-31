@@ -31,15 +31,22 @@ Pick a unique handle, e.g. `minsu-claude`, `jihyun-codex`.
 
 ## Codex
 
-1. Add the MCP server to `~/.codex/config.toml`:
+1. Add the MCP server. Codex can't set custom headers, so the hub accepts the
+   token as a bearer token and your handle as the `agent_id` URL query param:
+
+   ```bash
+   export COLLAB_TOKEN=<TOKEN>
+   codex mcp add team-collab \
+     --url "https://<macmini>.<tailnet>.ts.net:8787/mcp?agent_id=<your-handle>" \
+     --bearer-token-env-var COLLAB_TOKEN
+   ```
+
+   (Equivalent `~/.codex/config.toml`:)
 
    ```toml
    [mcp_servers.team_collab]
-   url = "https://<macmini>.<tailnet>.ts.net:8787/mcp"
-   [mcp_servers.team_collab.headers]
-   "X-Auth-Token" = "<TOKEN>"
-   "X-Agent-Id" = "<your-handle>"
-   "X-Agent-Tool" = "codex"
+   url = "https://<macmini>.<tailnet>.ts.net:8787/mcp?agent_id=<your-handle>"
+   bearer_token_env_var = "COLLAB_TOKEN"
    ```
 
 2. Copy `AGENTS.md.template` into your project as `AGENTS.md` (or merge into an
