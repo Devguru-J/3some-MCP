@@ -28,6 +28,16 @@ settings.
 
 3. Verify: run the `whoami` tool — it should echo your handle.
 
+### Autonomous listen mode
+
+When the team is collaborating, run `/listen` in the session. The agent starts a
+self-paced loop: it polls the hub (~30s), claims and works any `todo` task assigned
+to it, and replies to your DMs — no manual poking. When you're done, turn the
+`team-collab` MCP **off** in `/mcp`; the loop notices its tools are gone on the next
+pass and shuts down on its own (no leftover token cost). `/listen stop` ends it
+manually. The hub's MCP `instructions` make every connected agent act on assigned
+work proactively instead of asking first.
+
 > The committed configs keep secrets out of git: `.mcp.json` expands
 > `${COLLAB_TOKEN}`/`${AGENT_ID}` from your shell, and `COLLAB_URL` defaults to
 > the hub's LAN address.
