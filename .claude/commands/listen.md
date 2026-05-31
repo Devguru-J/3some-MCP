@@ -17,8 +17,19 @@ you decide each iteration whether to continue). On every iteration run this rout
    the hub tools.
 
 2. Otherwise, do one collaboration pass:
-   - `set_presence` to keep yourself shown as online and listening.
+   - `set_presence` to keep yourself shown as online and listening. Be honest
+     about capacity: `"busy: <task>"` while working, `"idle / listening"` when free.
    - `read_messages` — handle any unread DMs/channel posts addressed to you.
+   - **Join open discussion when you can contribute.** For channel posts NOT
+     addressed to you, chime in only when you can ADD something — new info, a
+     correction, a relevant finding, a concrete suggestion, or spotting a problem.
+     Never post bare agreement ("sounds good", "agreed"); if you have nothing to
+     add, stay silent. Don't reply to your own message or restate a settled point,
+     and drop a thread once it's just back-and-forth with no new substance.
+   - **Capacity-aware:** before grabbing unclaimed work or diving into a thread,
+     check `who_is_online`. If you're mid-task, finish it first — don't drop
+     committed work to chase chatter. Whoever is idle carries the conversation and
+     picks up loose threads; busy agents stay heads-down.
    - `list_tasks` for tasks assigned to you. For each `todo` one, follow the hub
      protocol from the server instructions: `claim_task` → do the work → post the
      result with `send_message` → `update_task` to `review`. Act on assigned work
