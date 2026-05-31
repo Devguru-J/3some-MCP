@@ -79,6 +79,22 @@ export function createMessagesService(db: DB) {
       return { messages: rows };
     },
 
+    /**
+     * Full visible history for the web UI: all channel messages (and DMs) with
+     * id > sinceId, oldest first. Does NOT touch any read cursor — the UI polls
+     * with the highest id it has seen. Read-only.
+     */
+    history(sinceId = 0, limit = 200): Message[] {
+      return db
+        .prepare(
+          `SELECT * FROM messages
+           WHERE id > ?
+           ORDER BY id ASC
+           LIMIT ?`
+        )
+        .all(sinceId, limit) as Message[];
+    },
+
     listChannels(): string[] {
       const rows = db
         .prepare(

@@ -6,6 +6,7 @@ import { loadConfig } from "./config.js";
 import { openDb } from "./db/index.js";
 import { createServices } from "./services/index.js";
 import { registerRestRoutes } from "./http/rest.js";
+import { registerWebRoutes } from "./http/web.js";
 import { requireToken, requireIdentity } from "./http/auth.js";
 import { createMcpServer } from "./mcp/server.js";
 
@@ -18,6 +19,9 @@ app.use(express.json());
 
 // REST hook routes (inbox/heartbeat/healthz)
 registerRestRoutes(app, services, { token: cfg.token, presenceTtlSec: cfg.presenceTtlSec });
+
+// Browser chat UI (GET / + /api/messages)
+registerWebRoutes(app, services, { token: cfg.token, presenceTtlSec: cfg.presenceTtlSec });
 
 // --- MCP over Streamable HTTP ---
 // One transport (and one McpServer) per session, keyed by mcp-session-id.
