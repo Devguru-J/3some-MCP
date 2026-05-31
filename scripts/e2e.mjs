@@ -7,7 +7,8 @@ import { rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const PORT = process.env.PORT ?? "8799";
+// Derive a per-process port so back-to-back / concurrent runs don't collide.
+const PORT = process.env.PORT ?? String(8000 + (process.pid % 1000));
 const TOKEN = "e2e-test-secret-token-1234567890";
 const HUB_URL = `http://localhost:${PORT}/mcp`;
 const DB_PATH = join(tmpdir(), `3some-e2e-${process.pid}.db`);
@@ -18,11 +19,18 @@ function cleanupDb() {
   }
 }
 
+// `npm start` spawns tsx→node grandchildren; signalling npm alone orphans them
+// (they keep holding the port). Run detached so we can kill the whole group.
+function stopServer(proc) {
+  try { process.kill(-proc.pid, "SIGKILL"); } catch { try { proc.kill("SIGKILL"); } catch {} }
+}
+
 async function bootServer() {
   cleanupDb();
   const proc = spawn("npm", ["start"], {
     env: { ...process.env, COLLAB_TOKEN: TOKEN, DB_PATH, PORT },
     stdio: "ignore",
+    detached: true,
   });
   for (let i = 0; i < 40; i++) {
     try {
@@ -31,15 +39,28 @@ async function bootServer() {
     } catch {}
     await new Promise((r) => setTimeout(r, 250));
   }
-  proc.kill("SIGKILL");
+  stopServer(proc);
   throw new Error("server did not come up within 10s");
 }
 
+// Claude Code style: custom X-Auth-Token + X-Agent-Id headers.
 async function connect(agentId) {
   const transport = new StreamableHTTPClientTransport(new URL(HUB_URL), {
     requestInit: {
       headers: { "x-auth-token": TOKEN, "x-agent-id": agentId, "x-agent-tool": "e2e" },
     },
+  });
+  const client = new Client({ name: `e2e-${agentId}`, version: "0.0.0" });
+  await client.connect(transport);
+  return client;
+}
+
+// Codex style: Authorization: Bearer + ?agent_id query param, NO custom headers.
+async function connectCodex(agentId) {
+  const url = new URL(HUB_URL);
+  url.searchParams.set("agent_id", agentId);
+  const transport = new StreamableHTTPClientTransport(url, {
+    requestInit: { headers: { Authorization: `Bearer ${TOKEN}` } },
   });
   const client = new Client({ name: `e2e-${agentId}`, version: "0.0.0" });
   await client.connect(transport);
@@ -62,10 +83,14 @@ async function main() {
   const server = await bootServer();
   console.log("  ✓ hub up on :" + PORT);
 
-  console.log("== connecting two agents ==");
+  console.log("== connecting agents ==");
   const claude = await connect("claude-1");
-  const codex = await connect("codex-1");
-  console.log("  ✓ both connected");
+  // codex-1 connects exactly as the Codex CLI does: bearer token + ?agent_id,
+  // proving the documented Codex setup actually works against the hub.
+  const codex = await connectCodex("codex-1");
+  console.log("  ✓ claude-1 (header auth) + codex-1 (bearer + ?agent_id) connected");
+  const codexWho = await call(codex, "whoami");
+  assert(codexWho.agentId === "codex-1", "codex identity resolved from ?agent_id");
 
   console.log("== tool discovery ==");
   const tools = await claude.listTools();
@@ -127,7 +152,7 @@ async function main() {
   // Best-effort teardown; the streamable-http client's SSE stream can reject on
   // abort, so don't let teardown noise flip a passing run to a failure.
   await Promise.allSettled([claude.close(), codex.close()]);
-  server.kill("SIGTERM");
+  stopServer(server);
 }
 
 main().then(
