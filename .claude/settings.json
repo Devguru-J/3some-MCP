@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "COLLAB_URL=\"${COLLAB_URL:-http://192.168.45.169:8787}\" \"$CLAUDE_PROJECT_DIR/setup/inbox-hook.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

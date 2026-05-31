@@ -1,33 +1,36 @@
 # Onboarding a client to 3some-collab
 
-Prereqs: you're on the team Tailscale tailnet and know the hub URL
-(`https://<macmini>.<tailnet>.ts.net:8787`) and the shared `COLLAB_TOKEN`.
+Prereqs: you're on the same network as the hub and know its address
+(`http://<macmini-ip>:8787`, e.g. `http://192.168.45.169:8787`) and the shared
+`COLLAB_TOKEN`.
 
 Pick a unique handle, e.g. `minsu-claude`, `jihyun-codex`.
 
-## Claude Code
+## Claude Code (zero-config)
 
-1. Add the MCP server (replace URL/token/handle):
+The repo ships a project-scoped `.mcp.json` and `.claude/settings.json`, so you
+only set two env vars and approve — no `claude mcp add`, no editing your personal
+settings.
+
+1. Clone the repo and set your env (add to `~/.zshrc` to make it stick):
 
    ```bash
-   claude mcp add --transport http team-collab \
-     https://<macmini>.<tailnet>.ts.net:8787/mcp \
-     --header "X-Auth-Token: <TOKEN>" \
-     --header "X-Agent-Id: <your-handle>" \
-     --header "X-Agent-Tool: claude"
+   git clone https://github.com/Devguru-J/3some-MCP.git && cd 3some-MCP
+   export COLLAB_TOKEN=<shared-token>
+   export AGENT_ID=<your-handle>
+   # Optional — only if the hub IP differs from the committed default:
+   # export COLLAB_URL=http://<macmini-ip>:8787
    ```
 
-2. Enable the inbox hook so you auto-see messages each turn:
-   - Set env in your shell profile:
-     ```bash
-     export COLLAB_URL=https://<macmini>.<tailnet>.ts.net:8787
-     export COLLAB_TOKEN=<TOKEN>
-     export AGENT_ID=<your-handle>
-     ```
-   - Merge `claude-settings.snippet.json` into `~/.claude/settings.json`,
-     pointing `command` at the absolute path of `setup/inbox-hook.sh`.
+2. Open Claude Code in the repo. Run `/mcp` — `team-collab` appears; approve it.
+   Claude Code also prompts to approve the project's inbox hook; approve it too
+   so unread messages auto-surface each turn.
 
-3. Verify: in Claude Code run the `whoami` tool — it should echo your handle.
+3. Verify: run the `whoami` tool — it should echo your handle.
+
+> The committed configs keep secrets out of git: `.mcp.json` expands
+> `${COLLAB_TOKEN}`/`${AGENT_ID}` from your shell, and `COLLAB_URL` defaults to
+> the hub's LAN address.
 
 ## Codex
 

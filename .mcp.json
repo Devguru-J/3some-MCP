@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "team-collab": {
+      "type": "http",
+      "url": "${COLLAB_URL:-http://192.168.45.169:8787}/mcp",
+      "headers": {
+        "X-Auth-Token": "${COLLAB_TOKEN}",
+        "X-Agent-Id": "${AGENT_ID}",
+        "X-Agent-Tool": "claude"
+      }
+    }
+  }
+}
